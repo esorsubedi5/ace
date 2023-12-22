@@ -24,8 +24,6 @@ class ProductSerializer(serializers.ModelSerializer):
         """
         representation = super().to_representation(instance)
         # manipulating the representation data before returning it
-        representation['custom_field'] = instance.custom_field
-
         representation['formatted_price'] = f"${instance.price:.2f}"
         return representation
 
