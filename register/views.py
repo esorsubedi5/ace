@@ -1,17 +1,41 @@
-from django.contrib.auth import login
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from .forms import CustomUserCreationForm
-from .models import UserProfile
+# register/views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout, get_user_model
+
+from .forms import UserLoginForm, UserRegisterForm
 from ace.views import home
+User = get_user_model()
 
-class CustomUserCreationView(CreateView):
-    model = UserProfile
-    form_class = CustomUserCreationForm
-    template_name = 'registration/register.html'
-    success_url = reverse_lazy(home)
+def login_view(request):
+    next = request.GET.get('next')
+    form = UserLoginForm(request.POST or None)
+    if form.is_valid():
+        username = form.cleaned_data.get('username')
+        password = form.cleaned_data.get('password')
+        user = authenticate(username=username, password=password)
+        login(request, user)
+        if next:
+            return redirect(next)
+        return redirect(home)
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        login(self.request, self.object)
-        return response
+    context = {'form': form}
+    return render(request, "registration\login.html", context)
+
+def register_view(request):
+    next = request.GET.get('next')
+    form = UserRegisterForm(request.POST or None)
+    if form.is_valid():
+        user = form.save(commit=False)
+        user.save()
+        new_user = authenticate(username=user.username, password=user.password)
+        login(request, new_user)
+        if next:
+            return redirect(next)
+        return redirect(home)
+
+    context = {'form': form}
+    return render(request, "registration/register.html", context=context)
+
+def logout_view(request):
+    logout(request)
+    return redirect(home)
