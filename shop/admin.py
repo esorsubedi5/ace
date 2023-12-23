@@ -1,10 +1,6 @@
 from django.contrib import admin
 from . import models
-# Register your models here.
-# User Profile
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user","mobile","email")
-admin.site.register(models.UserProfile, UserProfileAdmin)
+
 class PostcodeAdmin(admin.ModelAdmin):
     search_fields = ['postcode', ]
     list_display = ("postcode", "locality", "state", "type")

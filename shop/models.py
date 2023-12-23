@@ -1,15 +1,8 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.core.validators import EmailValidator, RegexValidator
 from django.utils.translation import gettext as _
+from register.models import UserProfile
 # User Profile model for storing user-related information
-class UserProfile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    mobile = models.IntegerField(validators=[RegexValidator(r'^\d{1,10}$')])
-    email = models.EmailField(validators=[EmailValidator()])
 
-    def __str__(self):
-        return self.user.username
 
 # State model for storing state information
 class State(models.Model):
