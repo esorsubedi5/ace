@@ -20,8 +20,9 @@ from .views import home
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', home, name='home'),
+    path('', home, name='home'),  # Ensure that the home URL is defined before including 'register'
     path('shop/', include('shop.urls')),
-    path('register/', include('register.urls')),
+    path('register/', include('register.urls', namespace='register')),
 ]
+
 

@@ -1,18 +1,30 @@
-<!-- ace/templates/registration/home.html -->
 <nav>
     <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
         {% if user.is_staff %}
-            <li><a href="{% url 'admin:index' %}">Admin Panel</a></li>
+        <li><a href="{% url 'admin:index' %}" target="_blank" >Admin Panel</a></li>
         {% endif %}
-        <li><a href="{% url 'register' %}">Register</a></li>
-        {% if user.is_authenticated %}
-            <li><a href="{% url 'logout' %}">Logout</a></li>
-        {% else %}
-            <li><a href="{% url 'login' %}">Login</a></li>
-        {% endif %}
-        <!-- Add other navigation links as needed -->
+        <li><a href="{% url 'product' %}">Product</a></li>
+      <li><a href="javascript:void(0);" onclick="openRegisterPopup()">Register</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'register:logout' %}">Logout</a></li>
+      {% else %}
+        <li><a href="javascript:void(0);" onclick="openLoginPopup()">Login</a></li>
+      {% endif %}
     </ul>
-</nav>
+  </nav>
+<script>
+    function openPopup(url, name) {
+      window.open(url, name, 'width=400,height=400');
+    }
+  
+    function openLoginPopup() {
+      openPopup("{% url 'register:login' %}", 'loginPopup');
+    }
+  
+    function openRegisterPopup() {
+      openPopup("{% url 'register:register' %}", 'registerPopup');
+    }
+  </script>
 
 {% block content %}{% endblock %}
