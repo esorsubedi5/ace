@@ -1,4 +1,3 @@
-# register/forms.py
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import get_user_model, authenticate
@@ -10,8 +9,9 @@ class UserLoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput)
 
     def clean(self, *args, **kwargs):
-        username = self.cleaned_data.get('username')
-        password = self.cleaned_data.get('password')
+        cleaned_data = super().clean()
+        username = cleaned_data.get('username')
+        password = cleaned_data.get('password')
 
         if username and password:
             user = authenticate(username=username, password=password)
@@ -22,7 +22,7 @@ class UserLoginForm(forms.Form):
             if not user.check_password(password):
                 raise forms.ValidationError('Incorrect Password')
 
-        return super(UserLoginForm, self).clean(*args, **kwargs)
+        return cleaned_data
 
 class UserRegisterForm(UserCreationForm):
     mobile = forms.CharField(max_length=15)
@@ -45,14 +45,19 @@ class UserRegisterForm(UserCreationForm):
         ]
 
     def clean(self, *args, **kwargs):
-        email = self.cleaned_data.get('email')
-        email2 = self.cleaned_data.get('email2')
+        cleaned_data = super().clean()
+        mobile = cleaned_data.get('mobile')
+        email = cleaned_data.get('email')
+        email2 = cleaned_data.get('email2')
 
         if email != email2:
             raise forms.ValidationError("Emails Don't Match")
 
         email_qs = User.objects.filter(email=email)
+        mobile_qs = User.objects.filter(mobile=mobile)
         if email_qs.exists():
             raise forms.ValidationError("Email is already in use")
+        if mobile_qs.exists():
+            raise forms.ValidationError("Mobile Number is already in use")
 
-        return super(UserRegisterForm, self).clean(*args, **kwargs)
+        return cleaned_data

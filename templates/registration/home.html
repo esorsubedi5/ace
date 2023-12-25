@@ -2,29 +2,31 @@
     <ul>
         <li><a href="{% url 'home' %}">Home</a></li>
         {% if user.is_staff %}
-        <li><a href="{% url 'admin:index' %}" target="_blank" >Admin Panel</a></li>
+        <li><a href="{% url 'admin:index' %}" target="_blank">Admin Panel</a></li>
         {% endif %}
         <li><a href="{% url 'product' %}">Product</a></li>
-      <li><a href="javascript:void(0);" onclick="openRegisterPopup()">Register</a></li>
-      {% if user.is_authenticated %}
-        <li><a href="{% url 'register:logout' %}">Logout</a></li>
-      {% else %}
-        <li><a href="javascript:void(0);" onclick="openLoginPopup()">Login</a></li>
-      {% endif %}
+        <li><a href="{% url 'register:register' %}" target="_blank" onclick="return openRegisterPopup();">Register</a></li>
+  
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'register:logout' %}">Logout</a></li>
+        {% else %}
+            <li><a href="{% url 'register:login' %}" target="_blank" onclick="return openLoginPopup();">Login</a></li>
+        {% endif %}
     </ul>
   </nav>
-<script>
+  <script>
     function openPopup(url, name) {
-      window.open(url, name, 'width=400,height=400');
+        window.open(url, name, 'width=400,height=400');
     }
   
     function openLoginPopup() {
-      openPopup("{% url 'register:login' %}", 'loginPopup');
+        openPopup("{% url 'register:login' %}", 'loginPopup');
+        return false;  
     }
   
     function openRegisterPopup() {
-      openPopup("{% url 'register:register' %}", 'registerPopup');
+        openPopup("{% url 'register:register' %}", 'registerPopup');
+        return false;  
     }
   </script>
-
-{% block content %}{% endblock %}
+  

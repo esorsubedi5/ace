@@ -69,7 +69,7 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='products_by_category')
     title = models.CharField(max_length=150)
     size = models.ForeignKey(Size, on_delete=models.SET_NULL, null=True, related_name='products_by_size')
-    detail = models.TextField(null=True)
+    detail = models.TextField(blank=True)
     price = models.FloatField()
     image = models.ImageField(upload_to='product_images/', null=True, blank=True)
 
@@ -102,7 +102,7 @@ class Order(models.Model):
     ordertime = models.DateTimeField(auto_now_add=True)
     total_price = models.FloatField(null=True, blank=True)
     address = models.ForeignKey(CustomerAddress, on_delete=models.SET_NULL, null=True, blank=True)
-    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -117,5 +117,5 @@ class Order(models.Model):
 
 
     def __str__(self):
-        return f'Order for {self.customer.user.username} at {self.ordertime}'
+        return f'Order for {self.customer.username} at {self.ordertime}'
     
