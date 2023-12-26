@@ -17,10 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from ace.views import home
-
+from schema_graph.views import Schema
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home, name='home'),
     path('shop/', include('shop.urls')),
     path('register/', include('register.urls', namespace='register')),
+    path('schema/', Schema.as_view()),
 ]

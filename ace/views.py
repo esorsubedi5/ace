@@ -1,11 +1,9 @@
 # ace/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.urls import reverse
-from django.contrib.auth.decorators import user_passes_test
-from django.http import HttpResponse
 
 def home(request):
     context = {
-        'register_url': reverse("register:register"),
+        'register_url': reverse("register:api-register"),  # Corrected name to 'api-register'
     }
     return render(request, "registration/home.html", context)

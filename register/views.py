@@ -1,50 +1,39 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.http import HttpResponse
-
-from .forms import UserLoginForm, UserRegisterForm
+from django.urls import reverse_lazy
+from django.shortcuts import redirect
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.contrib.auth import authenticate, login, logout
+from .serializers import UserRegisterSerializer, UserLoginSerializer
+from django.contrib.auth import get_user_model
 from ace.views import home
-
 User = get_user_model()
 
-def login_view(request):
-    next = request.GET.get('next')
-    form = UserLoginForm(request.POST or None)
-    if form.is_valid():
-        username = form.cleaned_data.get('username')
-        password = form.cleaned_data.get('password')
-        user = authenticate(request, username=username, password=password)
-        login(request, user)
-        if next:
-            return HttpResponse('<script>window.opener.location.reload(); window.close();</script>')
+class UserRegisterAPIView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserRegisterSerializer
+    permission_classes = [permissions.AllowAny]
+
+
+class UserLoginAPIView(generics.CreateAPIView):
+    serializer_class = UserLoginSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = authenticate(request, username=serializer.validated_data['username'], password=serializer.validated_data['password'])
+
+        if user:
+            login(request, user)
+            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
         else:
-            return HttpResponse('<script>window.opener.location.reload(); window.close();</script>')
+            return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    context = {'form': form}
-    return render(request, "registration\login.html", context)
 
-def authenticate_user(request, user):
-    new_user = authenticate(username=user.username, password=user.password)
-    if new_user is not None:
-        login(request, new_user)
-    else:
-        print("Authentication failed")
+class UserLogoutAPIView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAuthenticated]
 
-def register_view(request):
-    next = request.GET.get('next')
-    form = UserRegisterForm(request.POST or None)
-    if form.is_valid():
-        user = form.save(commit=False)
-        user.save()
-        authenticate_user(request, user)
-
-        if next:
-            return redirect(next)
-        return redirect('register:login')
-
-    context = {'form': form}
-    return render(request, "registration/register.html", context=context)
-
-def logout_view(request):
-    logout(request)
-    return redirect(home)
+    def destroy(self, request, *args, **kwargs):
+        logout(request)
+        return redirect(reverse_lazy(home))
